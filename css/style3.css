@@ -1,0 +1,126 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #28425d;
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+}
+
+.page-container {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Gallery Container */
+.gallery-container {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 20px 15px;
+}
+
+/* Row Layout */
+.photo-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.photo-row img {
+    flex: 1;
+    width: 30%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+}
+
+/* Button Styling */
+.button-container {
+    text-align: center;
+    padding: 20px 0 30px;
+}
+
+.next-btn {
+    width: 100%;
+    min-height: 44px;
+
+    margin-top: 14px;
+
+    border: none;
+    border-radius: 20px;
+
+    background-color: #b9f58d;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    cursor: pointer;
+
+    -webkit-tap-highlight-color: transparent;
+    color: black;
+}
+
+.next-btn:active {
+    transform: scale(0.96);
+}
+
+/* Sticky Bottom Banner */
+.museum-footer {
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    z-index: 10;
+    line-height: 0;
+}
+
+.museum-footer img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  /* Spotlight background gradient to simulate gallery lighting */
+  background: radial-gradient(circle at 50% 35%, #2a465d 0%, #172837 100%);
+  min-height: 100dvh; /* Adapts dynamically to iOS Safari address bar height */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  /* Respects iOS safe area overlay (Home bar & floating address pill) */
+  padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* Top Painting Container */
+.artwork-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 20px 15px;
+}
+
+.artwork-area img {
+  max-height: 38dvh; /* Ensures frame is fully visible without clipping */
+  max-width: 85%;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5)); /* Adds gallery wall depth */
+}
+
+/* Bottom Crowd / Museum Floor Graphic */
+.museum-floor {
+  width: 100%;
+  max-width: 430px;
+  margin-top: auto; /* Anchors crowd firmly to the bottom */
+}
