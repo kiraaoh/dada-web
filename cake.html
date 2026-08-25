@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Birthday Cake</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f7f4ee;
+            margin: 0;
+            font-family: sans-serif;
+        }
+
+        /* Container for image overlay positioning */
+        .cake-container {
+            position: relative;
+            width: 320px;
+        }
+
+        .cake-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 12px;
+        }
+
+        /* Animated CSS Flame Layer */
+        .flame {
+            position: absolute;
+            top: 4%;
+            /* Moved up from 7.2% */
+            left: 50.5%;
+            /* Shifted right from 49.3% */
+            transform: translateX(-50%);
+            width: 14px;
+            height: 22px;
+            background: radial-gradient(ellipse at bottom, #ffe100 0%, #ff5d00 60%, transparent 100%);
+            border-radius: 50% 50% 35% 35% / 60% 60% 40% 40%;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            filter: drop-shadow(0 0 6px #ffae00);
+        }
+
+        /* Flame Flicker Animation */
+        .flame.lit {
+            opacity: 1;
+            animation: flicker 0.1s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% {
+                transform: translateX(-50%) scale(1) rotate(-1deg);
+            }
+
+            100% {
+                transform: translateX(-50%) scale(1.1, 1.05) rotate(1deg);
+            }
+        }
+
+        /* Smoke effect when blown out */
+        .smoke {
+            position: absolute;
+            top: 3.8%;
+            /* Matched smoke position to flame tip */
+            left: 50.5%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            background: rgba(180, 180, 180, 0.6);
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .smoke.active {
+            animation: puff 0.8s ease-out forwards;
+        }
+
+        @keyframes puff {
+            0% {
+                opacity: 0.8;
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px) scale(2.5);
+            }
+        }
+
+        .controls {
+            margin-top: 20px;
+            width: 320px;
+            /* Matches the cake container width */
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            /* Two equal 50% columns */
+            gap: 12px;
+        }
+
+        button {
+            padding: 12px 0;
+            font-size: 15px;
+            font-weight: bold;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s, background-color 0.2s;
+            text-align: center;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #light-btn {
+            background-color: #ff4d6d;
+            color: white;
+        }
+
+        #blow-btn {
+            background-color: rgba(42, 69, 99, 1);
+            color: white;
+        }
+
+        #menu-btn {
+            grid-column: 1 / -1;
+            background-color: #b9f58d;
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="cake-container">
+        <!-- Replace src with your local image file path or web link -->
+        <img src="images/cake.jpg" alt="Birthday Cake" class="cake-image">
+
+        <!-- Dynamic Effects Layers -->
+        <div class="flame" id="flame"></div>
+        <div class="smoke" id="smoke"></div>
+    </div>
+
+    <div class="controls">
+        <button id="light-btn" onclick="lightCandle()">Light</button>
+        <button id="blow-btn" onclick="blowCandle()">Blow</button>
+        <button id="menu-btn" style="display: none;" onclick="goToMainMenu()">Main Menu</button>
+    </div>
+
+    <script>
+        const flame = document.getElementById('flame');
+        const smoke = document.getElementById('smoke');
+
+        let shakeThreshold = 15; // Sensitivity: lower = easier to trigger, higher = harder
+        let lastX = 0, lastY = 0, lastZ = 0;
+        let permissionGranted = false;
+
+        function blowCandle() {
+            if (flame.classList.contains('lit')) {
+                flame.classList.remove('lit');
+
+                // Trigger puff of smoke
+                smoke.classList.remove('active');
+                void smoke.offsetWidth; // Reset animation
+                smoke.classList.add('active');
+
+                // Show Main Menu button after candle goes off
+                document.getElementById('menu-btn').style.display = 'inline-block';
+            }
+        }
+
+        function lightCandle() {
+            flame.classList.add('lit');
+            smoke.classList.remove('active');
+
+            // Hide Main Menu button when candle is lit again
+            document.getElementById('menu-btn').style.display = 'none';
+
+            // Request iOS motion sensor permission on first interaction
+            requestMotionPermission();
+        }
+
+        function goToMainMenu() {
+            // Replace 'index.html' with your main menu URL or page path
+            window.location.href = 'home.html';
+        }
+
+        // Request motion permission for iOS 13+ devices
+        async function requestMotionPermission() {
+            if (permissionGranted) return;
+
+            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                try {
+                    const response = await DeviceMotionEvent.requestPermission();
+                    if (response === 'granted') {
+                        permissionGranted = true;
+                        window.addEventListener('devicemotion', handleMotion);
+                    }
+                } catch (error) {
+                    console.error('DeviceMotion permission denied or error:', error);
+                }
+            } else {
+                // Non-iOS or older devices that don't require explicit permission
+                window.addEventListener('devicemotion', handleMotion);
+            }
+        }
+
+        // Detect shake movement
+        function handleMotion(event) {
+            const current = event.accelerationIncludingGravity;
+            if (!current) return;
+
+            const deltaX = Math.abs(current.x - lastX);
+            const deltaY = Math.abs(current.y - lastY);
+            const deltaZ = Math.abs(current.z - lastZ);
+
+            // If movement on any axis exceeds threshold, blow out candle
+            if (deltaX > shakeThreshold || deltaY > shakeThreshold || deltaZ > shakeThreshold) {
+                blowCandle();
+            }
+
+            lastX = current.x;
+            lastY = current.y;
+            lastZ = current.z;
+        }
+    </script>
+</body>
+
+</html>
