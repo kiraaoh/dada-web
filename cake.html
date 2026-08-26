@@ -12,7 +12,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background-color: #f7f4ee;
+            background-color: rgba(215, 211, 199, 1);
             margin: 0;
             font-family: sans-serif;
         }
@@ -30,70 +30,7 @@
             border-radius: 12px;
         }
 
-        /* Animated CSS Flame Layer */
-        .flame {
-            position: absolute;
-            top: 4%;
-            /* Moved up from 7.2% */
-            left: 50.5%;
-            /* Shifted right from 49.3% */
-            transform: translateX(-50%);
-            width: 14px;
-            height: 22px;
-            background: radial-gradient(ellipse at bottom, #ffe100 0%, #ff5d00 60%, transparent 100%);
-            border-radius: 50% 50% 35% 35% / 60% 60% 40% 40%;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-            filter: drop-shadow(0 0 6px #ffae00);
-        }
-
-        /* Flame Flicker Animation */
-        .flame.lit {
-            opacity: 1;
-            animation: flicker 0.1s infinite alternate;
-        }
-
-        @keyframes flicker {
-            0% {
-                transform: translateX(-50%) scale(1) rotate(-1deg);
-            }
-
-            100% {
-                transform: translateX(-50%) scale(1.1, 1.05) rotate(1deg);
-            }
-        }
-
-        /* Smoke effect when blown out */
-        .smoke {
-            position: absolute;
-            top: 3.8%;
-            /* Matched smoke position to flame tip */
-            left: 50.5%;
-            transform: translateX(-50%);
-            width: 8px;
-            height: 8px;
-            background: rgba(180, 180, 180, 0.6);
-            border-radius: 50%;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .smoke.active {
-            animation: puff 0.8s ease-out forwards;
-        }
-
-        @keyframes puff {
-            0% {
-                opacity: 0.8;
-                transform: translateX(-50%) translateY(0) scale(1);
-            }
-
-            100% {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-20px) scale(2.5);
-            }
-        }
+        
 
         .controls {
             margin-top: 20px;
@@ -136,22 +73,107 @@
             background-color: #b9f58d;
             color: black;
         }
+
+        /* Base Flame Styling */
+        .flame {
+            position: absolute;
+            width: 12px;
+            height: 20px;
+            background: radial-gradient(ellipse at bottom, #ffe100 0%, #ff5d00 60%, transparent 100%);
+            border-radius: 50% 50% 35% 35% / 60% 60% 40% 40%;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            filter: drop-shadow(0 0 6px #ffae00);
+        }
+
+        /* Flame over the "2" candle */
+        .flame-2 {
+            top: 34.5%;
+            left: 57.5%;
+            transform: translateX(-50%);
+        }
+
+        /* Flame over the "1" candle */
+        .flame-1 {
+            top: 34.8%;
+            left: 67.8%;
+            transform: translateX(-50%);
+        }
+
+        .flame.lit {
+            opacity: 1;
+            animation: flicker 0.1s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% {
+                transform: translateX(-50%) scale(1) rotate(-1deg);
+            }
+
+            100% {
+                transform: translateX(-50%) scale(1.1, 1.05) rotate(1deg);
+            }
+        }
+
+        /* Base Smoke Styling */
+        .smoke {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: rgba(180, 180, 180, 0.6);
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .smoke-2 {
+            top: 35.0%;
+            left: 57.5%;
+            transform: translateX(-50%);
+        }
+
+        .smoke-1 {
+            top: 35.3%;
+            left: 67.8%;
+            transform: translateX(-50%);
+        }
+
+        .smoke.active {
+            animation: puff 0.8s ease-out forwards;
+        }
+
+        @keyframes puff {
+            0% {
+                opacity: 0.8;
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px) scale(2.5);
+            }
+        }
     </style>
 </head>
 
 <body>
 
     <div class="cake-container">
-        <!-- Replace src with your local image file path or web link -->
-        <img src="images/cake.jpg" alt="Birthday Cake" class="cake-image">
+        <!-- Replace with your new image path -->
+        <img src="images/cake1.jpg" alt="21st Birthday Cake" class="cake-image">
 
-        <!-- Dynamic Effects Layers -->
-        <div class="flame" id="flame"></div>
-        <div class="smoke" id="smoke"></div>
+        <!-- Flames for both candles -->
+        <div class="flame flame-2" id="flame1"></div>
+        <div class="flame flame-1" id="flame2"></div>
+
+        <!-- Smoke for both candles -->
+        <div class="smoke smoke-2" id="smoke1"></div>
+        <div class="smoke smoke-1" id="smoke2"></div>
     </div>
 
     <div class="controls">
-        <button id="light-btn" onclick="lightCandle()">Light</button>
+        <button id="light-btn" onclick="lightCandle()">Make a wish</button>
         <button id="blow-btn" onclick="blowCandle()">Blow</button>
         <button id="menu-btn" style="display: none;" onclick="goToMainMenu()">Main Menu</button>
     </div>
@@ -164,29 +186,32 @@
         let lastX = 0, lastY = 0, lastZ = 0;
         let permissionGranted = false;
 
-        function blowCandle() {
-            if (flame.classList.contains('lit')) {
-                flame.classList.remove('lit');
-
-                // Trigger puff of smoke
-                smoke.classList.remove('active');
-                void smoke.offsetWidth; // Reset animation
-                smoke.classList.add('active');
-
-                // Show Main Menu button after candle goes off
-                document.getElementById('menu-btn').style.display = 'inline-block';
-            }
-        }
-
         function lightCandle() {
-            flame.classList.add('lit');
-            smoke.classList.remove('active');
+            document.querySelectorAll('.flame').forEach(f => f.classList.add('lit'));
+            document.querySelectorAll('.smoke').forEach(s => s.classList.remove('active'));
 
-            // Hide Main Menu button when candle is lit again
+            // Hide Main Menu button when lit
             document.getElementById('menu-btn').style.display = 'none';
 
-            // Request iOS motion sensor permission on first interaction
+            // Request motion permission for iOS
             requestMotionPermission();
+        }
+
+        function blowCandle() {
+            const flames = document.querySelectorAll('.flame');
+            if (flames[0].classList.contains('lit')) {
+                flames.forEach(f => f.classList.remove('lit'));
+
+                // Trigger smoke for both candles
+                document.querySelectorAll('.smoke').forEach(s => {
+                    s.classList.remove('active');
+                    void s.offsetWidth; // Reset animation
+                    s.classList.add('active');
+                });
+
+                // Show Main Menu button
+                document.getElementById('menu-btn').style.display = 'inline-block';
+            }
         }
 
         function goToMainMenu() {
